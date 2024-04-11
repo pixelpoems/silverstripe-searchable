@@ -6,6 +6,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
 use ilateral\SilverStripe\Searchable\Tasks\ImportSearchDataTask;
+use SilverStripe\ORM\Connect\MySQLSchemaManager;
 
 /**
  * Base table to store searchable data in
@@ -16,6 +17,10 @@ class SearchTable extends DataObject
 
     private static $has_one = [
         'BaseObject' => DataObject::class
+    ];
+
+    private static $create_table_options = [
+        MySQLSchemaManager::ID => 'ENGINE=MyISAM',
     ];
 
     public function requireDefaultRecords()

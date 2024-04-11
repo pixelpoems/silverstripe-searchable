@@ -1,6 +1,6 @@
 {
-  "name": "i-lateral/silverstripe-searchable",
-  "description": "Updated search module for Silverstripe allowing addition of different data objects and makes use of the FulllTextFilter",
+    "name": "i-lateral/silverstripe-searchable",
+    "description": "Updated search module for Silverstripe allowing addition of different data objects and makes use of the FulllTextFilter",
     "type": "silverstripe-vendormodule",
     "homepage": "http://github.com/i-lateral/silverstripe-searchable",
     "keywords": [
@@ -20,7 +20,7 @@
         "issues": "http://github.com/i-lateral/silverstripe-searchable/issues"
     },
     "require": {
-        "silverstripe/framework": "~4.0"
+        "silverstripe/framework": ">=4.0"
     },
     "autoload": {
         "psr-4": {

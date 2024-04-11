@@ -15,7 +15,7 @@ use SilverStripe\CMS\Controllers\ContentController;
 
 /**
  * Controller responsible for handling search results
- * 
+ *
  * @package Searchable
  */
 class SearchResults extends Controller
@@ -89,8 +89,8 @@ class SearchResults extends Controller
 
     /**
      * Overwrite default init to support subsites (if installed)
-     * 
-     * @return void 
+     *
+     * @return void
      */
     protected function init()
     {
@@ -139,8 +139,7 @@ class SearchResults extends Controller
             );
 
             $objects_list->add(
-                ArrayData::create(
-                    [
+                ArrayData::create([
                     "Title" => $classname::singleton()->i18n_plural_name(),
                     "ClassName" => $classname,
                     "Results" => $results,
@@ -149,8 +148,7 @@ class SearchResults extends Controller
                         urlencode($classname),
                         "?Search={$keywords}"
                     )
-                    ]
-                )
+                ])
             );
         }
 
@@ -185,7 +183,7 @@ class SearchResults extends Controller
                 $cols = $columns;
             }
         }
-        
+
         if (!count($cols)) {
             return $this->httpError(
                 500,
@@ -195,8 +193,7 @@ class SearchResults extends Controller
 
         $keywords = $this->getQuery();
 
-        $this->customise(
-            [
+        $this->customise([
             "MetaTitle" => _t(
                 'Searchable.SearchResultsFor',
                 "Search Results for '{query}'",
@@ -210,8 +207,7 @@ class SearchResults extends Controller
                 ),
                 $this->request
             )->setPageLength($page_length)
-            ]
-        );
+        ]);
 
         $this->extend("onBeforeObject");
 

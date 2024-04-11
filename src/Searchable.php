@@ -2,10 +2,12 @@
 
 namespace ilateral\SilverStripe\Searchable;
 
+use SilverStripe\Core\Convert;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataQuery;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Dev\Deprecation;
+use SilverStripe\ORM\SS_List;
 use SilverStripe\View\ViewableData;
 use ilateral\SilverStripe\Searchable\Model\SearchTable;
 use ilateral\SilverStripe\Searchable\Control\SearchResults;
@@ -74,9 +76,9 @@ class Searchable extends ViewableData
      * Add an object to the Searchable module, this object will
      * automatically be added to the results page dashboard
      *
-     * @param $classname Classname of the object we want to search
-     * @param $columns   An array of database column names we will search
-     * @param $title     The title of this object (that will appear in the dashboard)
+     * @param $classname string Classname of the object we want to search
+     * @param $columns   array An array of database column names we will search
+     * @param $title     string The title of this object (that will appear in the dashboard)
      */
     public static function add($classname, $columns = array())
     {
@@ -93,10 +95,12 @@ class Searchable extends ViewableData
      * configuration and adds it.
      *
      * @param string $classname Name of the object we will be filtering
-     * @param array  $columns   an array of the column names we will be sorting
+     * @param array $columns an array of the column names we will be sorting
      * @param $query     the current search query
      *
      * @return SS_List
+     * @throws \ReflectionException
+     * @throws \Exception
      */
     public static function findResults(
         $classname,
@@ -106,6 +110,7 @@ class Searchable extends ViewableData
         $order = self::DEFAULT_ORDER
     ) {
         $custom_filters = Searchable::config()->custom_filters;
+        $keywords = self::cleanKeywords($keywords);
         $results = ArrayList::create();
         $all_classes = [$classname];
         $all_classes = array_merge(
@@ -121,15 +126,12 @@ class Searchable extends ViewableData
         );
 
         // Get a core results set from search table
-        $search = SearchTable::get()
-            ->filter(
-                [
+        $search = SearchTable::get()->filter([
                 'SearchFields:Fulltext' => $keywords,
                 'BaseObjectClass' => $all_classes
-                ]
-            );
+            ]);
 
-        // If custom filters used, filter any relevent items in search 
+        // If custom filters used, filter any relevent items in search
         if (is_array($custom_filters) && array_key_exists($classname, $custom_filters) && is_array($custom_filters[$classname])) {
             $object_ids = $classname::get()
                 ->filter($custom_filters[$classname])
@@ -168,12 +170,18 @@ class Searchable extends ViewableData
         return $results->removeDuplicates();
     }
 
+    protected static function cleanKeywords(string $keywords): string
+    {
+        return Convert::raw2sql($keywords);
+    }
+
     /**
-     * @param $classname Name of the object we will be filtering
-     * @param $columns   an array of the column names we will be sorting
-     * @param $query     the current search query
-     *
+     * @param $classname string Name of the object we will be filtering
+     * @param $columns   array an array of the column names we will be sorting
+     * @param $keywords
+     * @param int $limit
      * @return SS_List
+     * @throws \ReflectionException
      */
     public static function Results($classname, $columns, $keywords, $limit = 0)
     {

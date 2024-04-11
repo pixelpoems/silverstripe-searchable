@@ -95,8 +95,8 @@ class SearchableObjectExtension extends DataExtension
     {
         $owner = $this->getOwner();
         /**
- * @var SearchTable 
-*/
+         * @var SearchTable $owner
+         */
         $search = $owner->SearchRecord();
 
         if ($search->exists()) {
