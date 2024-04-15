@@ -2,6 +2,7 @@
 
 namespace ilateral\SilverStripe\Searchable;
 
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataQuery;
@@ -120,16 +121,18 @@ class Searchable extends ViewableData
 
         $search_filter = FulltextFilter::create('SearchFields', $keywords);
         $search_filter->setModel(SearchTable::class);
-        $select = sprintf(
-            "(MATCH (%s) AGAINST ('{$keywords}'))",
-            $search_filter->getDbName()
-        );
+
+        $where = [];
+        $tableName = SearchTable::singleton()->baseTable();
+        foreach (array_keys(Config::inst()->get(SearchTable::class, 'db')) as $column) {
+            $where[] = "\"{$tableName}\".\"{$column}\" LIKE '%{$keywords}%'";
+        }
+        $where = implode(' OR ', $where);
 
         // Get a core results set from search table
         $search = SearchTable::get()->filter([
-                'SearchFields:Fulltext' => $keywords,
-                'BaseObjectClass' => $all_classes
-            ]);
+            'BaseObjectClass' => array_unique(array_values($all_classes))
+        ]);
 
         // If custom filters used, filter any relevent items in search
         if (is_array($custom_filters) && array_key_exists($classname, $custom_filters) && is_array($custom_filters[$classname])) {
@@ -143,9 +146,8 @@ class Searchable extends ViewableData
         }
 
         $search = $search->alterDataQuery(
-            function (DataQuery $query) use ($select, $sort, $order) {
-                $query->selectField($select, self::DEFAULT_SORT);
-                $query->sort($sort, $order);
+            function (DataQuery $query) use ($where, $sort, $order) {
+                $query->where($where);
             }
         );
 
