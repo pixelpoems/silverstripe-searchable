@@ -172,7 +172,7 @@ class Searchable extends ViewableData
         return $results->removeDuplicates();
     }
 
-    protected static function cleanKeywords(string $keywords = ''): string
+    protected static function cleanKeywords(?string $keywords = ''): ?string
     {
         return Convert::raw2sql($keywords);
     }
